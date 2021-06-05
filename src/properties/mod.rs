@@ -1,11 +1,57 @@
-use crate::values::device_type::DeviceType;
-use crate::common::PropertyName;
-use crate::values::platform_name::PlatformName;
-use crate::values::browser_name::BrowserName;
+use crate::properties::device_type::DeviceType;
+use crate::properties::platform_name::PlatformName;
+use crate::properties::browser_name::BrowserName;
 
 pub mod device_type;
 pub mod platform_name;
 pub mod browser_name;
+
+pub enum PropertyName {
+    DeviceType,
+    IsSmartPhone,
+    IsTablet,
+    HardwareName,
+    HardwareModel,
+    HardwareVendor,
+    PlatformName,
+    PlatformVersion,
+    BrowserName,
+    BrowserVersion,
+}
+
+impl From<&PropertyName> for usize {
+    fn from(property_type: &PropertyName) -> Self {
+        match property_type {
+            PropertyName::DeviceType => 0,
+            PropertyName::IsSmartPhone => 1,
+            PropertyName::IsTablet => 2,
+            PropertyName::HardwareName => 3,
+            PropertyName::HardwareModel => 4,
+            PropertyName::HardwareVendor => 5,
+            PropertyName::PlatformName => 6,
+            PropertyName::PlatformVersion => 7,
+            PropertyName::BrowserName => 8,
+            PropertyName::BrowserVersion => 9
+        }
+    }
+}
+
+impl PropertyName {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            PropertyName::DeviceType => "DeviceType",
+            PropertyName::IsSmartPhone => "IsSmartPhone",
+            PropertyName::IsTablet => "IsTablet",
+            PropertyName::HardwareName => "HardwareName",
+            PropertyName::HardwareModel => "HardwareModel",
+            PropertyName::HardwareVendor => "HardwareVendor",
+            PropertyName::PlatformName => "PlatformName",
+            PropertyName::PlatformVersion => "PlatformVersion",
+            PropertyName::BrowserName => "BrowserName",
+            PropertyName::BrowserVersion => "BrowserVersion"
+        }
+    }
+}
 
 #[derive(PartialEq, Debug)]
 pub enum PropertyValue<'detector> {
@@ -18,11 +64,11 @@ pub enum PropertyValue<'detector> {
     PlatformName(PlatformName<'detector>),
     PlatformVersion(&'detector str),
     BrowserName(BrowserName<'detector>),
-    BrowserVersion(&'detector str)
+    BrowserVersion(&'detector str),
 }
 
-fn value_to_bool(value:&str) -> Option<bool>{
-    match value{
+fn value_to_bool(value: &str) -> Option<bool> {
+    match value {
         "True" => Some(true),
         "False" => Some(false),
         _ => None
@@ -50,7 +96,7 @@ impl<'detector> PropertyValue<'detector> {
             PropertyName::PlatformName => Some(PropertyValue::PlatformName(PlatformName::from(value))),
             PropertyName::BrowserName => Some(PropertyValue::BrowserName(BrowserName::from(value))),
             PropertyName::PlatformVersion => Some(PropertyValue::PlatformVersion(value)),
-            PropertyName::BrowserVersion =>  Some(PropertyValue::BrowserVersion(value))
+            PropertyName::BrowserVersion => Some(PropertyValue::BrowserVersion(value))
         }
     }
 }

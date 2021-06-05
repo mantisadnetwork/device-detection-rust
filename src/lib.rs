@@ -1,9 +1,6 @@
 #![allow(warnings)]
 
-use crate::hash::get_device;
-
-pub mod values;
-pub mod common;
+pub mod properties;
+pub mod api;
 
 mod shim;
-pub mod hash;

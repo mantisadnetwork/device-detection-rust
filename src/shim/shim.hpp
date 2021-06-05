@@ -11,24 +11,29 @@ class Result {
 public:
     Result(ResultsHash* hash);
 
-    rust::String getValueAsString(rust::Str propertyName) const;
+    rust::String getValueAsString(int propertyName) const;
 
-    bool getValueAsBool(rust::Str propertyName) const;
+    bool getValueAsBool(int propertyName) const;
 
-    int getValueAsInteger(rust::Str propertyName) const;
+    int getValueAsInteger(int propertyName) const;
 
-    double getValueAsDouble(rust::Str propertyName) const;
+    double getValueAsDouble(int propertyName) const;
 };
 
-class Engine {
-    EngineHash hash;
-public:
-    Engine(
-            rust::String dataFile,
-            DeviceDetection::Hash::ConfigHash *config,
-            Common::RequiredPropertiesConfig *properties);
+class Engine : public EngineHash {
+    public:
+        Engine(
+                rust::Str dataFile,
+                DeviceDetection::Hash::ConfigHash *config,
+                Common::RequiredPropertiesConfig *required,
+                rust::Vec <rust::Str> properties);
 
-    std::unique_ptr <Result> process(rust::Str arg) const;
+        rust::Vec<int> indexes() const;
+
+        std::unique_ptr <Result> lookup(rust::Str userAgent) const;
+
+    protected:
+        rust::Vec<rust::Str> properties;
 };
 
-std::unique_ptr <Engine> new_engine_hash(rust::String arg);
+std::unique_ptr <Engine> new_engine(rust::Str dataFile, rust::Vec<rust::Str> properties);

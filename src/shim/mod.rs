@@ -5,16 +5,17 @@ pub mod ffi {
 
         pub type Result;
 
-        pub fn getValueAsString(self: &Result, propertyName: &str) -> Result<String>;
-        pub fn getValueAsBool(self: &Result, propertyName: &str) -> Result<bool>;
-        pub fn getValueAsInteger(self: &Result, propertyName: &str) -> Result<i32>;
-        pub fn getValueAsDouble(self: &Result, propertyName: &str) -> Result<f64>;
+        pub fn getValueAsString(self: &Result, propertyName: i32) -> Result<String>;
+        pub fn getValueAsBool(self: &Result, propertyName: i32) -> Result<bool>;
+        pub fn getValueAsInteger(self: &Result, propertyName: i32) -> Result<i32>;
+        pub fn getValueAsDouble(self: &Result, propertyName: i32) -> Result<f64>;
 
-        pub fn new_engine_hash(agent:String) -> UniquePtr<Engine>;
+        pub fn new_engine(agent: &str, properties: Vec<&str>) -> UniquePtr<Engine>;
 
         pub type Engine;
 
-        pub fn process(self: &Engine, userAgent:&str) -> UniquePtr<Result>;
+        pub fn indexes(self: &Engine) -> Vec<i32>;
+        pub fn lookup(self: &Engine, userAgent:&str) -> UniquePtr<Result>;
     }
 }
 
