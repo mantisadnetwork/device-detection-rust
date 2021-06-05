@@ -9,6 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
