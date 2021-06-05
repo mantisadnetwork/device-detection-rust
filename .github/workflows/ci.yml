@@ -13,8 +13,8 @@ jobs:
 
       # needed for C to build
       - name: Install package
-          run: |
-            sudo apt-get -y install gnulib
+        run: |
+          sudo apt-get -y install gnulib
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
