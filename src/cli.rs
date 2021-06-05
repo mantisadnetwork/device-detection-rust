@@ -53,7 +53,7 @@ fn main() {
 
     let now = Instant::now();
 
-    (0..10000).into_par_iter().for_each(|_| {
+    (0..1000000).into_par_iter().for_each(|_| {
         let result = engine.lookup("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36");
 
         result.getValueAsString(PropertyName::DeviceType).unwrap();
@@ -70,5 +70,5 @@ fn main() {
 
     let elapsed = now.elapsed();
 
-    println!("\nTime per Lookup (ms): {:.2?}\n", elapsed / 10000);
+    println!("\nTime per Lookup (ms): {:.2?}\n", elapsed / 1000000);
 }

@@ -53,6 +53,10 @@ std::unique_ptr <Engine> new_engine(rust::Str dataFile, rust::Vec <rust::Str> pr
 Result::Result(ResultsHash *hash) : hash(hash) {
 }
 
+Result::~Result() {
+    delete hash;
+}
+
 rust::String Result::getValueAsString(int propertyName) const {
     Value <string> value = hash->getValueAsString(propertyName);
 

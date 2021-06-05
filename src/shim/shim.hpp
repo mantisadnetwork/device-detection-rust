@@ -10,6 +10,7 @@ class Result {
     ResultsHash* hash;
 public:
     Result(ResultsHash* hash);
+    ~Result();
 
     rust::String getValueAsString(int propertyName) const;
 
