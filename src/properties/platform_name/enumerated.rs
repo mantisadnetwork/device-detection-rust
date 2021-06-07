@@ -1,15 +1,15 @@
 #[derive(PartialEq, Debug)]
-pub enum PlatformName<'detector> {
+pub enum PlatformName {
     Android,
     MacOS,
     IOS,
     Windows,
-    Other(&'detector str)
+    Other(String),
 }
 
-impl<'detector> From<&'detector str> for PlatformName<'detector> {
-    fn from(value: &'detector str) -> Self {
-        match value {
+impl From<String> for PlatformName {
+    fn from(value: String) -> Self {
+        match value.as_str() {
             "Android" => PlatformName::Android,
             "macOS" => PlatformName::MacOS,
             "iOS" => PlatformName::IOS,

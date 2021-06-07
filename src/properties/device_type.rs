@@ -1,5 +1,5 @@
 #[derive(PartialEq, Debug)]
-pub enum DeviceType{
+pub enum DeviceType {
     Console,
     Desktop,
     EReader,
@@ -9,12 +9,12 @@ pub enum DeviceType{
     SmartPhone,
     SmartWatch,
     Tablet,
-    Tv
+    Tv,
 }
 
 impl DeviceType {
-    pub fn from_str(value: &str) -> Option<DeviceType>{
-        match value{
+    pub fn from(value: String) -> Option<DeviceType> {
+        match value.as_str() {
             "Console" => Some(DeviceType::Console),
             "Desktop" => Some(DeviceType::Desktop),
             "EReader" => Some(DeviceType::EReader),

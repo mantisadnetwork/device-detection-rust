@@ -1,5 +1,5 @@
 #[derive(PartialEq, Debug)]
-pub enum BrowserName<'detector> {
+pub enum BrowserName {
     Chrome,
     Safari,
     Facebook,
@@ -7,12 +7,12 @@ pub enum BrowserName<'detector> {
     InternetExplorer,
     Edge,
     Firefox,
-    Other(&'detector str),
+    Other(String),
 }
 
-impl<'detector> From<&'detector str> for BrowserName<'detector> {
-    fn from(value: &'detector str) -> Self {
-        match value {
+impl From<String> for BrowserName {
+    fn from(value: String) -> Self {
+        match value.as_str() {
             "Chrome" => BrowserName::Chrome,
             "Chrome Mobile" => BrowserName::Chrome,
             "Chrome for iOS" => BrowserName::Chrome,

@@ -4,11 +4,11 @@ pub enum BrowserMode {
     Chrome,
     Headless,
     MobileAsDesktop,
-    VirtualReality
+    VirtualReality,
 }
 
 #[derive(PartialEq, Debug)]
-pub enum BrowserName<'detector> {
+pub enum BrowserName {
     Chrome(BrowserMode),
     Safari,
     Facebook,
@@ -16,12 +16,12 @@ pub enum BrowserName<'detector> {
     InternetExplorer(BrowserMode),
     Edge(BrowserMode),
     Firefox(BrowserMode),
-    Other(&'detector str),
+    Other(String),
 }
 
-impl<'detector> From<&str> for BrowserName<'detector> {
-    fn from(value: &str) -> Self {
-        match value {
+impl From<String> for BrowserName {
+    fn from(value: String) -> Self {
+        match value.as_str() {
             "Chrome" => BrowserName::Chrome(BrowserMode::Standard),
             "Chrome (Mobile in desktop mode)" => BrowserName::Chrome(BrowserMode::MobileAsDesktop),
             "Chrome Headless" => BrowserName::Chrome(BrowserMode::Headless),

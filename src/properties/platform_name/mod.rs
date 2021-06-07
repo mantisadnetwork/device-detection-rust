@@ -40,7 +40,7 @@
 ///
 */
 #[cfg(not(feature = "platform-name-enum"))]
-pub type PlatformName<'detector> = &'detector str;
+pub type PlatformName = String;
 
 #[cfg(feature = "platform-name-enum")]
 mod enumerated;

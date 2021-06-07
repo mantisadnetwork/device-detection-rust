@@ -9,6 +9,7 @@ pub mod browser_name;
 pub enum PropertyName {
     DeviceType,
     IsSmartPhone,
+    IsMobile,
     IsTablet,
     HardwareName,
     HardwareModel,
@@ -31,7 +32,8 @@ impl From<&PropertyName> for usize {
             PropertyName::PlatformName => 6,
             PropertyName::PlatformVersion => 7,
             PropertyName::BrowserName => 8,
-            PropertyName::BrowserVersion => 9
+            PropertyName::BrowserVersion => 9,
+            PropertyName::IsMobile => 10
         }
     }
 }
@@ -42,6 +44,7 @@ impl PropertyName {
             PropertyName::DeviceType => "DeviceType",
             PropertyName::IsSmartPhone => "IsSmartPhone",
             PropertyName::IsTablet => "IsTablet",
+            PropertyName::IsMobile => "IsMobile",
             PropertyName::HardwareName => "HardwareName",
             PropertyName::HardwareModel => "HardwareModel",
             PropertyName::HardwareVendor => "HardwareVendor",
@@ -54,49 +57,48 @@ impl PropertyName {
 }
 
 #[derive(PartialEq, Debug)]
-pub enum PropertyValue<'detector> {
-    DeviceType(DeviceType),
+pub enum PropertyBooleanValue {
     IsSmartPhone(bool),
     IsTablet(bool),
-    HardwareName(&'detector str),
-    HardwareModel(&'detector str),
-    HardwareVendor(&'detector str),
-    PlatformName(PlatformName<'detector>),
-    PlatformVersion(&'detector str),
-    BrowserName(BrowserName<'detector>),
-    BrowserVersion(&'detector str),
 }
 
-fn value_to_bool(value: &str) -> Option<bool> {
-    match value {
-        "True" => Some(true),
-        "False" => Some(false),
-        _ => None
+#[derive(PartialEq, Debug)]
+pub enum PropertyStringValue {
+    DeviceType(DeviceType),
+    HardwareName(String),
+    HardwareModel(String),
+    HardwareVendor(String),
+    PlatformName(PlatformName),
+    PlatformVersion(String),
+    BrowserName(BrowserName),
+    BrowserVersion(String),
+}
+
+impl PropertyStringValue {
+    pub fn new(property_name: &PropertyName, value: String) -> Option<PropertyStringValue> {
+        match property_name {
+            PropertyName::HardwareName => Some(PropertyStringValue::HardwareName(value)),
+            PropertyName::HardwareVendor => Some(PropertyStringValue::HardwareVendor(value)),
+            PropertyName::HardwareModel => Some(PropertyStringValue::HardwareModel(value)),
+            PropertyName::DeviceType => match DeviceType::from(value) {
+                Some(converted) => Some(PropertyStringValue::DeviceType(converted)),
+                _ => None
+            },
+            PropertyName::PlatformName => Some(PropertyStringValue::PlatformName(PlatformName::from(value))),
+            PropertyName::BrowserName => Some(PropertyStringValue::BrowserName(BrowserName::from(value))),
+            PropertyName::PlatformVersion => Some(PropertyStringValue::PlatformVersion(value)),
+            PropertyName::BrowserVersion => Some(PropertyStringValue::BrowserVersion(value)),
+            _ => panic!("The property name provided does not support string lookup.")
+        }
     }
 }
 
-impl<'detector> PropertyValue<'detector> {
-    pub fn new(property_name: &PropertyName, value: &'detector str) -> Option<PropertyValue<'detector>> {
+impl PropertyBooleanValue {
+    pub fn new(property_name: &PropertyName, value: bool) -> PropertyBooleanValue {
         match property_name {
-            PropertyName::HardwareName => Some(PropertyValue::HardwareName(value)),
-            PropertyName::HardwareVendor => Some(PropertyValue::HardwareVendor(value)),
-            PropertyName::HardwareModel => Some(PropertyValue::HardwareModel(value)),
-            PropertyName::IsSmartPhone => match value_to_bool(value) {
-                Some(converted) => Some(PropertyValue::IsSmartPhone(converted)),
-                _ => None
-            },
-            PropertyName::IsTablet => match value_to_bool(value) {
-                Some(converted) => Some(PropertyValue::IsTablet(converted)),
-                _ => None
-            },
-            PropertyName::DeviceType => match DeviceType::from_str(value) {
-                Some(converted) => Some(PropertyValue::DeviceType(converted)),
-                _ => None
-            },
-            PropertyName::PlatformName => Some(PropertyValue::PlatformName(PlatformName::from(value))),
-            PropertyName::BrowserName => Some(PropertyValue::BrowserName(BrowserName::from(value))),
-            PropertyName::PlatformVersion => Some(PropertyValue::PlatformVersion(value)),
-            PropertyName::BrowserVersion => Some(PropertyValue::BrowserVersion(value))
+            PropertyName::IsSmartPhone => PropertyBooleanValue::IsSmartPhone(value),
+            PropertyName::IsTablet => PropertyBooleanValue::IsTablet(value),
+            _ => panic!("The property name provided does not support boolean lookup.")
         }
     }
 }

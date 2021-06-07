@@ -44,7 +44,7 @@
 */
 
 #[cfg(not(any(feature = "browser-name-enum", feature = "browser-name-enum-mode")))]
-pub type BrowserName<'detector> = &'detector str;
+pub type BrowserName = String;
 
 #[cfg(feature = "browser-name-enum-mode")]
 mod with_mode;
