@@ -18,9 +18,6 @@ path = "src/cli.rs"
 [features]
 browser-name-enum = []
 browser-name-enum-mode = []
-platform-name-enum = []
-trie = []
-pattern = []
 
 [dependencies]
 libc = "0.2.95"
