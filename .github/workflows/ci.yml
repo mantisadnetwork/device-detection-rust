@@ -5,7 +5,10 @@ name: build
 jobs:
   build:
     name: Build
-    runs-on: macos-latest
+    strategy:
+      matrix:
+        os: [macos-latest, 	ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with:

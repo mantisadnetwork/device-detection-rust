@@ -1,0 +1,10 @@
+*
+!src/*
+!device-detection-cxx/src/hash/*
+!device-detection-cxx/src/*.c*
+!device-detection-cxx/src/*.h*
+!device-detection-cxx/src/common-cxx/*.h*
+!device-detection-cxx/src/common-cxx/*.c*
+!build.rs
+!Cargo.lock
+!Cargo.toml
