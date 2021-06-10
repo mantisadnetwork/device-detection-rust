@@ -25,7 +25,22 @@ jobs:
         with:
           command: build
 
+  publish:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
       - uses: katyo/publish-crates@v1
-        if: ${{ github.ref == 'refs/heads/master' }}
         with:
           registry-token: ${{ secrets.CRATES }}
