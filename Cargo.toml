@@ -1,9 +1,10 @@
 [package]
 name = "fiftyonedegrees"
-version = "0.2.10"
+version = "0.2.11"
 edition = "2018"
 license = "MIT"
 authors = ["Paris Holley <mail@parisholley.com>"]
+
 description = "A wrapper around the 51Degrees device detection C library."
 
 [lib]
@@ -12,9 +13,6 @@ path = "src/lib.rs"
 [[example]]
 name = "benchmark"
 path = "src/benchmark.rs"
-
-[features]
-static = []
 
 [dependencies]
 cxx = "1.0"
