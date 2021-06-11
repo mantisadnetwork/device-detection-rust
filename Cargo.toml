@@ -1,6 +1,6 @@
 [package]
 name = "fiftyonedegrees"
-version = "0.2.9"
+version = "0.2.10"
 edition = "2018"
 license = "MIT"
 authors = ["Paris Holley <mail@parisholley.com>"]
@@ -14,8 +14,7 @@ name = "benchmark"
 path = "src/benchmark.rs"
 
 [features]
-browser-name-enum = []
-browser-name-enum-mode = []
+static = []
 
 [dependencies]
 cxx = "1.0"
