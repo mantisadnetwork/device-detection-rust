@@ -2,7 +2,7 @@
 name = "fiftyonedegrees"
 version = "0.2.9"
 edition = "2018"
-license = "EUPL"
+license = "MIT"
 authors = ["Paris Holley <mail@parisholley.com>"]
 description = "A wrapper around the 51Degrees device detection C library."
 
