@@ -13,8 +13,8 @@ pub enum DeviceType {
 }
 
 impl DeviceType {
-    pub fn from(value: String) -> Option<DeviceType> {
-        match value.as_str() {
+    pub fn from(value: &str) -> Option<DeviceType> {
+        match value {
             "Console" => Some(DeviceType::Console),
             "Desktop" => Some(DeviceType::Desktop),
             "EReader" => Some(DeviceType::EReader),

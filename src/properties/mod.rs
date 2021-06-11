@@ -63,19 +63,19 @@ pub enum PropertyBooleanValue {
 }
 
 #[derive(PartialEq, Debug)]
-pub enum PropertyStringValue {
+pub enum PropertyStringValue<'a> {
     DeviceType(DeviceType),
-    HardwareName(String),
-    HardwareModel(String),
-    HardwareVendor(String),
+    HardwareName(&'a str),
+    HardwareModel(&'a str),
+    HardwareVendor(&'a str),
     PlatformName(PlatformName),
-    PlatformVersion(String),
+    PlatformVersion(&'a str),
     BrowserName(BrowserName),
-    BrowserVersion(String),
+    BrowserVersion(&'a str),
 }
 
-impl PropertyStringValue {
-    pub fn new(property_name: &PropertyName, value: String) -> Option<PropertyStringValue> {
+impl PropertyStringValue<'_> {
+    pub fn new<'a>(property_name: &PropertyName, value: &'a str) -> Option<PropertyStringValue<'a>> {
         match property_name {
             PropertyName::HardwareName => Some(PropertyStringValue::HardwareName(value)),
             PropertyName::HardwareVendor => Some(PropertyStringValue::HardwareVendor(value)),

@@ -1,22 +1,17 @@
 [package]
 name = "fiftyonedegrees"
-version = "0.2.3"
+version = "0.2.8"
 edition = "2018"
-license = "MPL-2.0"
+license = "EUPL"
 authors = ["Paris Holley <mail@parisholley.com>"]
-description = "A wrapper around Rust FFI bindings for the 51Degrees device detection C++ library."
-include = [
-    "device-detection-cxx/src/hash/*",
-    "device-detection-cxx/src/*.c*",
-    "device-detection-cxx/src/*.h*",
-    "device-detection-cxx/src/common-cxx/*.h*",
-    "device-detection-cxx/src/common-cxx/*.c*",
-    "src/*",
-    "build.rs"
-]
+description = "A wrapper around the 51Degrees device detection C library."
 
 [lib]
 path = "src/lib.rs"
+
+[[example]]
+name = "benchmark"
+path = "src/benchmark.rs"
 
 [features]
 browser-name-enum = []
@@ -24,9 +19,10 @@ browser-name-enum-mode = []
 
 [dependencies]
 cxx = "1.0"
+
+[dev-dependencies]
 rayon = "1.5.1"
+glob = "0.3.0"
 
 [build-dependencies]
 cc = "1.0.68"
-cxx-build = "1.0"
-glob = "0.3.0"

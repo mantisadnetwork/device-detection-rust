@@ -1,49 +1,105 @@
-use crate::shim::ffi::{Engine, Result, new_engine};
-use crate::properties::{PropertyName, PropertyStringValue, PropertyBooleanValue};
-use cxx::UniquePtr;
+use std::alloc::{alloc, Layout};
+use crate::properties::{PropertyBooleanValue, PropertyName, PropertyStringValue};
 use crate::properties::device_type::DeviceType;
+use crate::shim::{mapPropertyToIndex, freeInit, freeResults, fiftyoneDegreesManagerResults, getResultsValue, initToResults, fiftyoneDegreesManagerInit, initToDataset, fiftyoneDegreesDataSetRelease, fiftyoneDegreesHashHighPerformanceConfig, fiftyoneDegreesConfigHash, fiftyoneDegreesDataSetGet, fiftyoneDegreesException, fiftyoneDegreesManagerInitFile, fiftyoneDegreesPropertiesGetRequiredPropertyIndexFromName, fiftyoneDegreesPropertiesRequired, fiftyoneDegreesResourceManager, fiftyoneDegreesResultsHash, fiftyoneDegreesResultsHashCreate, fiftyoneDegreesResultsHashFromUserAgent, fiftyoneDegreesResultsHashGetValuesString, fiftyoneDegreesResultsHashGetValuesStringByRequiredPropertyIndex, fiftyoneDegreesResourceHandleIncUse, fiftyoneDegreesDataSetBase};
+use std::ffi::{CString, CStr};
+use std::borrow::BorrowMut;
+use std::cell::RefCell;
+use std::sync::atomic::{AtomicPtr, Ordering};
 
 pub type PropertyIndexes = [i32; 11];
 
 pub struct DeviceDetection {
-    engine: UniquePtr<Engine>,
+    init: fiftyoneDegreesManagerInit,
     mapping: PropertyIndexes,
 }
 
-pub struct DeviceDetectionResult<'a> {
-    engine: &'a DeviceDetection,
-    result: UniquePtr<Result>,
+impl Drop for DeviceDetection {
+    fn drop(&mut self) {
+        unsafe {
+            freeInit(self.init);
+        }
+    }
 }
 
+unsafe impl Send for DeviceDetection {}
 
-impl DeviceDetectionResult<'_> {
-    pub fn getValueAsInteger(&self, property: PropertyName) -> std::result::Result<i32, cxx::Exception> {
-        self.result.getValueAsInteger(self.engine.mapping[usize::from(&property)])
+unsafe impl Sync for DeviceDetection {}
+
+pub struct DeviceDetectionResult<'a> {
+    mapping: &'a PropertyIndexes,
+    results: fiftyoneDegreesManagerResults,
+}
+
+impl Drop for DeviceDetectionResult<'_> {
+    fn drop(&mut self) {
+        unsafe {
+            freeResults(self.results);
+        }
     }
+}
 
-    pub fn getValueAsPropertyString(&self, property: PropertyName) -> std::result::Result<Option<PropertyStringValue>, cxx::Exception> {
-        let result = self.result.getValueAsString(self.engine.mapping[usize::from(&property)]);
-
-        match result {
-            Ok(value) => Ok(PropertyStringValue::new(&property, value)),
-            Err(e) => Err(e)
+// fiftyoneDegreesResultsHashFree
+impl DeviceDetectionResult<'_> {
+    pub fn getValueAsInteger(&self, property: &PropertyName) -> std::result::Result<Option<i32>, &str> {
+        match self.getValueAsString(property) {
+            Ok(value) => match value {
+                Some(string) => match string.parse() {
+                    Ok(int) => Ok(Some(int)),
+                    Err(_) => Err("Unable to convert property string value to int")
+                },
+                None => Ok(None)
+            },
+            Err(e) => Err("Unable to get property as string")
         }
     }
 
-    pub fn getValueAsString(&self, property: PropertyName) -> std::result::Result<String, cxx::Exception> {
-        self.result.getValueAsString(self.engine.mapping[usize::from(&property)])
+    pub fn getValueAsPropertyString(&self, property: &PropertyName) -> std::result::Result<Option<PropertyStringValue>, &str> {
+        match self.getValueAsString(property) {
+            Ok(value) => match value {
+                Some(string) => Ok(PropertyStringValue::new(property, string)),
+                None => Ok(None)
+            },
+            Err(e) => Err("Unable to get property as string")
+        }
     }
 
-    pub fn getValueAsBoolean(&self, property: PropertyName) -> std::result::Result<bool, cxx::Exception> {
-        self.result.getValueAsBool(self.engine.mapping[usize::from(&property)])
+    pub fn getValueAsString(&self, property: &PropertyName) -> std::result::Result<Option<&str>, &str> {
+        let string_ptr = unsafe { getResultsValue(&self.results, self.mapping[usize::from(property)]) };
+
+        let string = unsafe {
+            CStr::from_ptr(string_ptr)
+        };
+
+        // TODO: use from_utf8_unchecked to remove performance penalty of utf-8 check
+        // https://github.com/rust-lang/rust/issues/75196
+        match string.to_str() {
+            Ok(str) => Ok(Some(str)),
+            Err(e) => Err("The pointer returned from C is not a valid utf-8 string")
+        }
     }
 
-    pub fn getValueAsPropertyBoolean(&self, property: PropertyName) -> std::result::Result<PropertyBooleanValue, cxx::Exception> {
-        let result = self.result.getValueAsBool(self.engine.mapping[usize::from(&property)]);
+    pub fn getValueAsBoolean(&self, property: &PropertyName) -> std::result::Result<Option<bool>, &str> {
+        match self.getValueAsString(property) {
+            Ok(value) => match value {
+                Some(string) => {
+                    Ok(Some(string.eq("True")))
+                }
+                None => Ok(None)
+            },
+            Err(_) => Err("Unable to get property as string")
+        }
+    }
+
+    pub fn getValueAsPropertyBoolean(&self, property: &PropertyName) -> std::result::Result<Option<PropertyBooleanValue>, &str> {
+        let result = self.getValueAsBoolean(property);
 
         match result {
-            Ok(value) => Ok(PropertyBooleanValue::new(&property, value)),
-            Err(e) => Err(e)
+            Ok(value) => match value {
+                Some(bool) => Ok(Some(PropertyBooleanValue::new(property, bool))),
+                None => Ok(None)
+            },
+            Err(_) => Err("Unable to get property as boolean")
         }
     }
 }
@@ -56,38 +112,47 @@ impl DeviceDetection {
             converted.push(property.as_str());
         }
 
-        let engine = unsafe {
-            new_engine(dataFile, converted)
-        };
+        let required_properties = CString::new(converted.join(",")).expect("CString::new failed");
+        let file_name = CString::new(dataFile).expect("CString::new failed");
 
-        let indexes = engine.indexes();
+        let init = unsafe {
+            fiftyoneDegreesManagerInitFile(required_properties.as_ptr(), file_name.as_ptr())
+        };
 
         let mut mapping: PropertyIndexes = [-1; 11];
 
-        for (propertyIndex, datasetIndex) in indexes.iter().enumerate() {
-            mapping[usize::from(&properties[propertyIndex])] = *datasetIndex as i32;
+        for property in &properties {
+            let property_string = CString::new(property.as_str()).expect("CString::new failed");
+
+            mapping[usize::from(property)] = unsafe {
+                mapPropertyToIndex(&init, property_string.as_ptr())
+            };
         }
 
         DeviceDetection {
-            engine,
+            init,
             mapping,
         }
     }
 
     pub fn lookup(&self, userAgent: &str) -> DeviceDetectionResult {
-        let result = self.engine.lookup(userAgent);
+        let ua_string = CString::new(userAgent).expect("CString::new failed");
+
+        let results = unsafe {
+            initToResults(&self.init, ua_string.as_ptr())
+        };
 
         DeviceDetectionResult {
-            engine: &self,
-            result,
+            mapping: &self.mapping,
+            results,
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::properties::PropertyName;
     use crate::api::DeviceDetection;
+    use crate::properties::PropertyName;
     use crate::properties::PropertyName::DeviceType;
 
     const ua: &str = "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_2 like Mac OS X) AppleWebKit/603.2.4 (KHTML, like Gecko) FxiOS/7.5b3349 Mobile/14F89 Safari/603.2.4";
@@ -106,10 +171,14 @@ mod tests {
 
         let matched = engine.lookup(ua);
 
-        assert_eq!(matched.getValueAsBoolean(PropertyName::IsMobile).unwrap(), true);
-        assert_eq!(matched.getValueAsString(PropertyName::BrowserName).unwrap(), "Firefox for iOS");
-        assert_eq!(matched.getValueAsString(PropertyName::PlatformName).unwrap(), "iOS");
-        assert_eq!(matched.getValueAsString(PropertyName::BrowserVersion).unwrap(), "7.5");
-        assert_eq!(matched.getValueAsString(PropertyName::PlatformVersion).unwrap(), "10.3.2");
+        assert_eq!(matched.getValueAsBoolean(&PropertyName::IsMobile).unwrap().unwrap(), true);
+        assert_eq!(matched.getValueAsString(&PropertyName::BrowserName).unwrap().unwrap(), "Firefox for iOS");
+        assert_eq!(matched.getValueAsString(&PropertyName::PlatformName).unwrap().unwrap(), "iOS");
+        assert_eq!(matched.getValueAsString(&PropertyName::BrowserVersion).unwrap().unwrap(), "7.5");
+        assert_eq!(matched.getValueAsString(&PropertyName::PlatformVersion).unwrap().unwrap(), "10.3.2");
+
+        // verify our drop code doesn't cause panics
+        drop(matched);
+        drop(engine);
     }
 }
