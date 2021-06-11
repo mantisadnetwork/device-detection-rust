@@ -1,3 +1,21 @@
+# Usage
+
+```rust
+use fiftyonedegrees::properties::PropertyName;
+use fiftyonedegrees::api::DeviceDetection;
+
+fn main() {
+    let properties = vec![PropertyName::IsMobile];
+
+    let engine = DeviceDetection::new("path/to/file.hash", properties);
+
+    let result = engine.lookup("my user agent");
+    
+    let boolean = result.getValueAsBoolean(&PropertyName::IsMobile).unwrap().unwrap();
+    let string = result.getValueAsString(&PropertyName::BrowserName).unwrap().unwrap();
+}
+```
+
 # Development
 
 **Install Result**

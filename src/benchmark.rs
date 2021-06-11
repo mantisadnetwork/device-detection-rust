@@ -31,7 +31,7 @@ fn main() {
 
     println!("Building Engine...");
 
-    let mut engine = DeviceDetection::new("device-detection-cxx/device-detection-data/51Degrees-LiteV4.1.hash", properties);
+    let engine = DeviceDetection::new("device-detection-cxx/device-detection-data/51Degrees-LiteV4.1.hash", properties);
 
     println!("Doing Lookup...");
 
