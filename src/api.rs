@@ -67,6 +67,10 @@ impl DeviceDetectionResult<'_> {
     pub fn getValueAsString(&self, property: &PropertyName) -> std::result::Result<Option<&str>, &str> {
         let string_ptr = unsafe { getResultsValue(&self.results, self.mapping[usize::from(property)]) };
 
+        if std::ptr::null() == string_ptr {
+            return Ok(None);
+        }
+
         let string = unsafe {
             CStr::from_ptr(string_ptr)
         };
