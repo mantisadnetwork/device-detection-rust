@@ -1,5 +1,7 @@
 use std::fs;
+use std::env;
 use cc::Build;
+use std::path::PathBuf;
 
 fn scan(build: &mut Build, path: &str, suffix: &str) {
     let paths = fs::read_dir(path).unwrap();
@@ -37,6 +39,11 @@ fn main() {
     build.include(".");
     build.flag("-std=c++11");
     build.compile("cxxbridge");
+
+    let out = PathBuf::from(env::var("OUT_DIR").unwrap());
+
+    // TODO: c compilation leaves old ".o" files that cause "multiple definition"
+    fs::remove_dir_all(out.join("device-detection-cxx")).unwrap();
 
     println!("cargo:rerun-if-changed=src/shim/mod.rs");
     println!("cargo:rerun-if-changed=src/shim/shim.cpp");
