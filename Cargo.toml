@@ -1,6 +1,6 @@
 [package]
 name = "fiftyonedegrees"
-version = "0.2.8"
+version = "0.2.9"
 edition = "2018"
 license = "EUPL"
 authors = ["Paris Holley <mail@parisholley.com>"]
