@@ -19,12 +19,14 @@ fn scan(build: &mut Build, path: &str, suffix: &str) {
 fn main() {
     let mut c = cc::Build::new();
     c.warnings(false);
+    c.shared_flag(true);
+    c.cargo_metadata(false);
 
     scan(&mut c, "./device-detection-cxx/src/", ".c");
     scan(&mut c, "./device-detection-cxx/src/hash/", ".c");
     scan(&mut c, "./device-detection-cxx/src/common-cxx/", ".c");
 
-    c.compile("c");
+    c.compile("c.so");
 
     let source_files = vec!["src/shim/mod.rs"];
 
@@ -42,7 +44,7 @@ fn main() {
 
     let out = PathBuf::from(env::var("OUT_DIR").unwrap());
 
-    // TODO: c compilation leaves old ".o" files that cause "multiple definition"
+    // prevent git submodule from being packaged
     fs::remove_dir_all(out.join("device-detection-cxx")).unwrap();
 
     println!("cargo:rerun-if-changed=src/shim/mod.rs");
