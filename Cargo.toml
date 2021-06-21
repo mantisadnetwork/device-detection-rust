@@ -1,9 +1,10 @@
 [package]
 name = "fiftyonedegrees"
-version = "0.2.11"
+version = "0.2.15"
 edition = "2018"
 license = "MIT"
 authors = ["Paris Holley <mail@parisholley.com>"]
+include = ["device-detection-cxx/src/*.*", "device-detection-cxx/src/hash/*.*", "device-detection-cxx/src/common-cxx/*.*", "src/**/*", "build.rs"]
 
 description = "A wrapper around the 51Degrees device detection C library."
 
@@ -14,12 +15,8 @@ path = "src/lib.rs"
 name = "benchmark"
 path = "src/benchmark.rs"
 
-[dependencies]
-cxx = "1.0"
-
 [dev-dependencies]
 rayon = "1.5.1"
-glob = "0.3.0"
 
 [build-dependencies]
 cc = "1.0.68"
