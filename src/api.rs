@@ -7,7 +7,7 @@ use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::sync::atomic::{AtomicPtr, Ordering};
 
-pub type PropertyIndexes = [i32; 11];
+pub type PropertyIndexes = [i32; 12];
 
 pub struct DeviceDetection {
     init: fiftyoneDegreesManagerInit,
@@ -123,7 +123,7 @@ impl DeviceDetection {
             fiftyoneDegreesManagerInitFile(required_properties.as_ptr(), file_name.as_ptr())
         };
 
-        let mut mapping: PropertyIndexes = [-1; 11];
+        let mut mapping: PropertyIndexes = [-1; 12];
 
         for property in &properties {
             let property_string = CString::new(property.as_str()).expect("CString::new failed");
