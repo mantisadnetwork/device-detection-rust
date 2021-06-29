@@ -11,6 +11,7 @@ pub enum PropertyName {
     IsSmartPhone,
     IsMobile,
     IsTablet,
+    IsCrawler,
     HardwareName,
     HardwareModel,
     HardwareVendor,
@@ -33,7 +34,8 @@ impl From<&PropertyName> for usize {
             PropertyName::PlatformVersion => 7,
             PropertyName::BrowserName => 8,
             PropertyName::BrowserVersion => 9,
-            PropertyName::IsMobile => 10
+            PropertyName::IsMobile => 10,
+            PropertyName::IsCrawler => 11
         }
     }
 }
@@ -51,7 +53,8 @@ impl PropertyName {
             PropertyName::PlatformName => "PlatformName",
             PropertyName::PlatformVersion => "PlatformVersion",
             PropertyName::BrowserName => "BrowserName",
-            PropertyName::BrowserVersion => "BrowserVersion"
+            PropertyName::BrowserVersion => "BrowserVersion",
+            PropertyName::IsCrawler => "IsCrawler"
         }
     }
 }
@@ -60,6 +63,7 @@ impl PropertyName {
 pub enum PropertyBooleanValue {
     IsSmartPhone(bool),
     IsTablet(bool),
+    IsCrawler(bool),
 }
 
 #[derive(PartialEq, Debug)]
@@ -98,6 +102,7 @@ impl PropertyBooleanValue {
         match property_name {
             PropertyName::IsSmartPhone => PropertyBooleanValue::IsSmartPhone(value),
             PropertyName::IsTablet => PropertyBooleanValue::IsTablet(value),
+            PropertyName::IsCrawler => PropertyBooleanValue::IsCrawler(value),
             _ => panic!("The property name provided does not support boolean lookup.")
         }
     }
