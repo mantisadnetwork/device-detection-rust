@@ -18,13 +18,13 @@ fn main() {
 
 # Development
 
-**Install Result**
+**Install Rust**
 
 https://www.rust-lang.org/tools/install
 
 **Install bindgen**
 
-`cargo install bindgen`
+`cargo install bindgen-cli`
 
 **Download c code**
 
@@ -37,6 +37,10 @@ https://www.rust-lang.org/tools/install
 `cd device-detection-cxx`
 
 `git checkout 4.2.3`
+
+`cd src/common-cxx`
+
+`git submodule update`
 
 **Regenerate c bindings for rust**
 
