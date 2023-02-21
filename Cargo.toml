@@ -20,3 +20,4 @@ rayon = "1.5.1"
 
 [build-dependencies]
 cc = "1.0.68"
+libc = { version = "0.2", features = ["extra_traits"] }
